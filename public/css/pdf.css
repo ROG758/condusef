@@ -1,0 +1,71 @@
+/* Estilo específico para la cabecera */
+.table th {
+    background-color: rgb(2, 73, 2);
+    color: white;
+    font-size: 20px;
+}
+
+.table {
+    text-align: center;
+    font-size: 13px;
+    margin-top: 20px;
+    z-index: 0;
+}
+
+/* Estilo para filas pares */
+.table tr:nth-child(even) {
+    background-color: #f2f2f2; /* Cambia el color  */
+}
+
+/* Estilo para filas impares */
+.table tr:nth-child(odd) {
+    background-color: #ffffff; /* Cambia el ccolor*/
+}
+
+
+
+.logo-hacienda{
+    float:left;
+    top: 0px; 
+    right: 10px; 
+    width: 200px; 
+    height: auto; 
+    z-index: 0; 
+}  
+
+
+.logo-condusef{
+    position: fixed;    
+    top: 0px; 
+    right: 10px; 
+    width: 100px; 
+    height: auto; 
+    z-index: 0; 
+}
+
+.text-cab{
+   text-align: center;
+   margin-top: 60;
+
+} 
+
+.logo-container {
+    position: fixed; /* Fijar el logo en la página */
+    top: 50%; /* Posición vertical del logo */
+    left: 50%; /* Posición horizontal del logo */
+    transform: translate(-50%, -50%); /* Centrar el logo */
+    opacity: 0.3; /* Opacidad del logo */
+    z-index: 1000; /* Colocar el logo detrás del contenido */
+}
+
+.escudo-nacional {
+    width: 500px; /* Ancho del logo */
+    height: auto; /* Altura ajustada automáticamente */
+    opacity: 0.3;
+}
+
+/*linea de nombre y firma*/
+.nombre-firma{
+    text-align: center;
+    margin-top: 50px;
+}
