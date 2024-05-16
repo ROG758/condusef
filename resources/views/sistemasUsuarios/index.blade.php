@@ -125,8 +125,7 @@
             @csrf
             <div class="container">
                 <div class="row">
-
-                    <div class="col">
+                    <div class="col-xl">
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="opcionTodo" id="1" value="option1"
                                 checked>
@@ -146,13 +145,13 @@
                         </div>
                     </div>
 
-                    <div class="col">
+                    <div class="col-sm">
                         <select name="acce" id="acce" class="form-control">
 
                         </select>
                     </div>
 
-                    <div class="col">
+                    <div class="col-sm">
                         <button type="submit" class="btn btn-padding"><i class="fas fa-file-pdf"></i> Exportar</button>
                     </div>
                 </div>
@@ -245,12 +244,13 @@ $(document).ready(function() {
                 success: function(data) {
                     $('#acce').empty().append('<option value="#">Seleccione</option>');
                     $.each(data, function(index, value) {
-                        $('#acce').append('<option value""' + value.idVicepre +
-                            '">' + value.vicepresidencia + '</option>'
-                        );
+                        $('#acce').append('<option value="' + value.idVicepre +
+                            '">' + value.vicepresidencia + '</option>');
                     });
+
+
                 },
-                error:function(xhr,status,error){
+                error: function(xhr, status, error) {
                     console.error(error);
                 }
             });

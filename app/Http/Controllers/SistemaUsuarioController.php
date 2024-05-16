@@ -42,15 +42,15 @@ class SistemaUsuarioController extends Controller
         $acce = $this->unique();
         $usua= $this->uniqueusuario(); 
         $vicepres=$this->uniquevicepre();
-        //dd($usua);      JOSE MARTIN
+       
         return view('sistemasUsuarios.index', compact('vistas','acce','usua','vicepres'));
     }
     
 
     public function pdf(Request $request)
     {
-        $acceSeleccionado = $request->input('acce');
-        $opcionSeleccionada = $request->input('opcionTodo'); // Captura el valor correcto del input
+        $acceSeleccionado = $request->input('acce');        
+        $opcionSeleccionada = $request->input('opcionTodo'); // Captura el valor 
         
         if ($acceSeleccionado == "#" || $acceSeleccionado == null) {
             // Ejecuta la consulta y obtén los datos
@@ -67,13 +67,14 @@ class SistemaUsuarioController extends Controller
             $pdf = PDF::loadView('sistemasUsuarios.pdf', compact('vistas'));
             return $pdf->stream();
         } elseif ($opcionSeleccionada == 'option3') {
+            //nenerar pdf por personal
             // Obtener el personal asociado a un sistema específico
             $vistas = PersonalModel::join('usuarios_sistemas', 'personal.idPersonal', '=', 'usuarios_sistemas.idPersonal')
                 ->join('accesos', 'usuarios_sistemas.idAccesos', '=', 'accesos.idAccesos')
                 ->selectRaw("CONCAT(personal.numeroEmpleado, ' ', personal.nombre, ' ', personal.apellidoPaterno, ' ', personal.apellidoMaterno) as nombre, CONCAT(accesos.claveSistema, ' ', accesos.nombreSistema) as clavesistema")
                 ->where('usuarios_sistemas.idPersonal', $acceSeleccionado)
                 ->get();
-            
+          
             // Obtener y concatenar el nombre completo del personal
             $resultado = PersonalModel::where('idPersonal', $acceSeleccionado)
                 ->selectRaw("CONCAT(nombre, ' ', apellidoPaterno, ' ', apellidoMaterno) as nombreCompleto")
@@ -86,12 +87,38 @@ class SistemaUsuarioController extends Controller
             $pdf = PDF::loadView('sistemasUsuarios.pdf0', compact('vistas', 'nombreCompleto'));
         
             return $pdf->stream();
-        } else {
+        }elseif($opcionSeleccionada == 'option4'){
+            //negerar pdf de vicepresidencias 
+            $vistas = UsuarioVistaModel::join('personal as p', 'usuarios_sistemas.idPersonal', '=', 'p.idPersonal')
+            ->join('accesos as a', 'usuarios_sistemas.idaccesos', '=', 'a.idaccesos')
+            ->join('vicepresidencia as v', 'v.idVicepre', '=', 'p.idVicepre')
+            ->selectRaw("CONCAT(p.numeroEmpleado, ' - ', p.nombre, '  ', p.apellidoPaterno, '  ', p.apellidoMaterno) as nombre")
+            ->selectRaw("CONCAT(' ', a.claveSistema, ' - ', a.nombreSistema) as claveSistema")
+            ->where('v.idVicepre', $acceSeleccionado)
+            ->get();
+        // Ejecuta la consulta y obtiene los resultados
+
+            //dd($acceSeleccionado);
+            $resultado = VicepresidenciaModel::where('idVicepre', $acceSeleccionado)
+                ->pluck('vicepresidencia');
+                //dd($resultado);
+                $resultado = strval($resultado[0]);
+
+          
+        // Pasa los datos a la vista y genera el PDF
+        $pdf = PDF::loadView('sistemasUsuarios.pdf2', compact('vistas','resultado'));
+        return $pdf->stream();
+            
+
+        }else {
+
+            //nenerar pdf por sistemas
             $vistas = PersonalModel::join('usuarios_sistemas', 'personal.idPersonal', '=', 'usuarios_sistemas.idPersonal')
                 ->selectRaw("CONCAT(personal.numeroEmpleado, ' ', personal.nombre, ' ', personal.apellidoPaterno, ' ', personal.apellidoMaterno) as nombre")
                 ->where('usuarios_sistemas.idAccesos', $acceSeleccionado)
                 ->get();
     
+               
             $resultado = AccesoModel::where('idAccesos', $acceSeleccionado)->pluck('nombreSistema');
             $resultado = strval($resultado[0]);
     
@@ -158,7 +185,7 @@ class SistemaUsuarioController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function nombreupdate(Request $request, string $id)
     {
         //
     }
@@ -201,7 +228,7 @@ class SistemaUsuarioController extends Controller
         UsuarioVistaModel::Raw("CONCAT(p.numeroEmpleado, ' ', p.nombre,' ',p.apellidoPaterno) as nombre"),
         'p.idPersonal'
         )
-        ->distinct('a.idaidPersonalccesos')
+        ->distinct('a.idPersonalccesos')
         ->get();
 
 
@@ -214,10 +241,9 @@ class SistemaUsuarioController extends Controller
        public function uniquevicepre(){
         $vicepresidencias = VicepresidenciaModel::join('personal', 'personal.idVicepre', '=', 'vicepresidencia.idVicepre')
         ->join('usuarios_sistemas', 'usuarios_sistemas.idPersonal', '=', 'personal.idPersonal')
-        ->select('vicepresidencia.vicepresidencia')
-        ->distinct()
+        ->select('vicepresidencia.idVicepre')
+        ->distinct('idVicepre')
         ->get();
-
     
         return $vicepresidencias;
        }
@@ -255,14 +281,12 @@ class SistemaUsuarioController extends Controller
 
     public function obtenerDatosVicepresidenciaJson()
     {
-        $concatvicepresidencia=VicepresidenciaModel::join('personal', 'personal.idVicepre', '=', 'vicepresidencia.idVicepre')
-        ->join('usuarios_sistemas', 'usuarios_sistemas.idPersonal', '=', 'personal.idPersonal')
-        ->select('vicepresidencia.vicepresidencia')
-        ->distinct()
-        ->get();
-
+        $concatvicepresidencia = VicepresidenciaModel::join('personal', 'personal.idVicepre', '=', 'vicepresidencia.idVicepre')
+            ->join('usuarios_sistemas', 'usuarios_sistemas.idPersonal', '=', 'personal.idPersonal')
+            ->select('vicepresidencia.vicepresidencia','vicepresidencia.idVicepre as idVicepre')
+            ->distinct('vicepresidencia.idVicepre')
+            ->get();
         return Response::json($concatvicepresidencia);
-
     }
         
     }
