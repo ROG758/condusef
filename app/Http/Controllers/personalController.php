@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\personalModel;
 use App\Models\AccesoModel;
-use App\Models\ViseprecidenciaModel;
+use App\Models\VicepresidenciaModel;
 use Illuminate\Database\QueryException;
 
 class personalController extends Controller
@@ -38,8 +38,8 @@ class personalController extends Controller
     public function create()
     {
         //
-     
-        return view('usuarios.create');
+        $Vicepresidencia =VicepresidenciaModel::all();
+        return view('usuarios.create',compact('Vicepresidencia'));
     }
 
     /**
@@ -63,6 +63,7 @@ class personalController extends Controller
         $personal->apellidoPaterno=$request-> apellidoPaterno;
         $personal->apellidoMaterno=$request-> apellidoMaterno;
         $personal->area=$request-> area;
+        $personal->idVicepre=$request->idVicepre;
         $personal->save();
         return $personal;
 
@@ -84,8 +85,9 @@ class personalController extends Controller
     public function edit($id)
     {
         //
+        $Vicepresidencia =VicepresidenciaModel::all();
         $personal=personalModel::where('idPersonal',$id)->firstOrFail();
-        return view('usuarios.edit',compact('personal'));
+        return view('usuarios.edit',compact('personal','Vicepresidencia'));
     }
 
     /**

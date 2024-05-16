@@ -37,6 +37,19 @@
         </div>
     </div>
 
+    <div class="col-12">
+    <label for="">Vicepresidencia</label>
+            <div>
+                <select name="idVicepre" id="idVicepre" class="form-comtrol">
+                    <option value="#">Seleccione</option>
+                    @foreach($Vicepresidencia as $Vicepresidencias)
+                    <option value="{{$Vicepresidencias['idVicepre']}}">{{$Vicepresidencias['vicepresidencia']}}</option>
+                    @endforeach
+                </select>
+            </div>
+
+    </div>
+
   
 
 </div>
