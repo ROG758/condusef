@@ -107,9 +107,18 @@ class UsuarioVistaController extends Controller
      */
     public function destroy(string $id)
     {
-        //
-       
+        $personal=UsuarioVistaModel::findOrFail($id);
+        try{
+            $personal->delete();
+            return redirect()
+            ->route('vista.index');
+        }catch(QueryException $e){
+            return redirect()
+            ->route('vista.index');
+        }
     }
+       
+    
 
 
 

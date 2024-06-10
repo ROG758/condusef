@@ -34,7 +34,9 @@
             </div>
         </div>
 
-        <!-- agregar la clasiosicacion del sistema-->
+      
+
+         agregar la clasiosicacion del sistema
         <div class="col-group">
             <div class="col-group">
                 <label for="">Clasificación</label>
@@ -43,7 +45,7 @@
             </div>
         </div>
 
-        <!-- agregar el área que desarrollo el sistema-->
+        <!-- agregar el área que desarrollo el sistema -->
         <div class="col-group">
             <div class="col-group">
                 <label for="">Área desarrolladora</label>
@@ -52,7 +54,7 @@
             </div>
         </div>
 
-        <!--agraga estatus de sistema -->
+      <!--  agraga estatus de sistema -->
         <div class="col-group">
             <label for="">¿El sistema se encuentra activo?</label>
             <input type="text" class="form-control" name="estatus"
@@ -64,9 +66,9 @@
             <input type="text" class="form-control" name="url" value="{{(isset($acceso))?$acceso->url:old('url')}}"
                 required>
         </div>
+<!--
 
-
-        <!-- agrega la infomracion de roles del sistema-->
+        agrega la infomracion de roles del sistema-
         <div class="col-group">
             <label for="">Roles del sistema</label>
             <div>
@@ -81,7 +83,7 @@
 
 
 
-        <!-- agrega la infomracion general  del sistema-->
+        agrega la infomracion general  del sistema-
         <div class="col-group">
             <label for="">Informacón General del Sistema</label>
             <div>
@@ -96,7 +98,7 @@
 
 
 
-        <!-- agrega la caracteristicas de roles del sistema-->
+        agrega la caracteristicas de roles del sistema
         <div class="col-group">
             <label for="">Características del Sistema</label>
             <div>
@@ -110,7 +112,7 @@
         </div>
 
 
-         <!-- agrega la Documentacion  del sistema-->
+          agrega la Documentacion  del sistema
          <div class="col-group">
             <label for="">Documentación del Sistema</label>
             <div>
@@ -124,7 +126,7 @@
         </div>
 
 
-         <!-- agrega la infomracion seguridad en  sistema-->
+        agrega la infomracion seguridad en  sistema
          <div class="col-group">
             <label for="">Seguridad del Sistema</label>
             <div>
@@ -137,7 +139,7 @@
             </div>
         </div>
 
-         <!-- agrega la datos personales en sistema-->
+         agrega la datos personales en sistema
          <div class="col-group">
             <label for="">Datos personales en Sistema</label>
             <div>
@@ -152,7 +154,7 @@
 
 
 
-         <!-- agrega la infomracion de mantenimineto  del sistema-->
+         agrega la infomracion de mantenimineto  del sistema-
          <div class="col-group">
             <label for="">Matenimiento del Sistema</label>
             <div>
@@ -165,7 +167,7 @@
             </div>
         </div>
 
-
+-->
 
 
     </div>

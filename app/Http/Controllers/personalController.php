@@ -28,8 +28,11 @@ class personalController extends Controller
                 ->orWhere('apellidoMaterno','like','%'.$request->search.'%')
                 ->orWhere('area','like','%'.$request->search.'%');
         }
+
+        $vicepresi = VicepresidenciaModel::all();
+
         $personal = $personal->paginate($limit)->appends($request->all());
-        return view('usuarios.index',compact('personal'));
+        return view('usuarios.index',compact('personal','vicepresi'));
     }
 
     /**

@@ -13,33 +13,33 @@ return new class extends Migration
     {
         Schema::create('accesos', function (Blueprint $table) {
 
-            $table->integer('idRolSistema')->unsigned();
+            $table->integer('idRolSistema')->unsigned()->nullable();
             $table->foreign('idRolSistema')->references('idRolSistema')->on('roles_sistema');
     
     
             //
-            $table->integer('idInformacion')->unsigned();
+            $table->integer('idInformacion')->unsigned()->nullable();
             $table->foreign('idInformacion')->references('idInformacion')->on('informacion');
     
     
             // 
-            $table->integer('idCaracteriticas')->unsigned();
+            $table->integer('idCaracteriticas')->unsigned()->nullable();
             $table->foreign('idCaracteriticas')->references('idCaracteriticas')->on('caracteristicas');
     
             //
-            $table->integer('idDocumentacion')->unsigned();
+            $table->integer('idDocumentacion')->unsigned()->nullable();
             $table->foreign('idDocumentacion')->references('idDocumentacion')->on('documentacion');
     
             //
-            $table->integer('idSeguridad')->unsigned();
+            $table->integer('idSeguridad')->unsigned()->nullable();
             $table->foreign('idSeguridad')->references('idSeguridad')->on('seguridad'); 
     
             //
-            $table->integer('idMantenimiento')->unsigned();
+            $table->integer('idMantenimiento')->unsigned()->nullable();
             $table->foreign('idMantenimiento')->references('idMantenimiento')->on('mantenimiento'); 
     
             //
-            $table->integer('idDatos')->unsigned();
+            $table->integer('idDatos')->unsigned()->nullable();
             $table->foreign('idDatos')->references('idDatos')->on('datos_personales'); 
             
             $table->increments('idAccesos');

@@ -77,14 +77,14 @@ class AccesoController extends Controller
         $acceso->desarrollo=$request-> desarrollo;
         $acceso->estatus=$request-> estatus;
         $acceso->url=$request-> url;
-        $acceso->idRolSistema=$request->idRolSistema;
-        $acceso->idInformacion=$request->idInformacion;
-        $acceso->idCaracteriticas=$request->idCaracteriticas;
-        $acceso->idDocumentacion=$request->idDocumentacion;
-        $acceso->idSeguridad=$request->idSeguridad;
-        $acceso->idMantenimiento=$request->idMantenimiento;
-        $acceso->idDatos=$request->idDatos;
-        $acceso->idAccesos=$request->idAccesos;
+        $acceso->idRolSistema = null;
+        $acceso->idInformacion = null;
+        $acceso->idCaracteriticas = null;
+        $acceso->idDocumentacion = null;
+        $acceso->idSeguridad = null;
+        $acceso->idMantenimiento = null;
+        $acceso->idDatos = null;
+        $acceso->idAccesos = null;
         
 
         $acceso->save();

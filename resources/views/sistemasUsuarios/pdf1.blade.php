@@ -37,9 +37,10 @@
 
         <thead class="table th.cabecera">
             <tr>
-               
-                
+
+                <th>Estatus</th>
                 <th>Clave de Empleado Usuario</th>
+
             </tr>
         </thead>
         <tbody class="cuerpotabla">
@@ -47,9 +48,20 @@
 
             @foreach($vistas as $nom)
             <tr>
-               
-                
+
+                <td>
+                    @foreach($estatus as $status)
+                    @if($status->idSistemaPersona == $nom->idSistemaPersona)
+                    @if($status->estatus == 1)
+                    Activo
+                    @elseif($status->estatus == 0)
+                    Inactivo
+                    @endif
+                    @endif
+                    @endforeach
+                </td>
                 <td>{{$nom->nombre}}</td>
+
             </tr>
             @endforeach
 

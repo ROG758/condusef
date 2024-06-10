@@ -34,13 +34,30 @@
     <table class="table">
         <thead class="table th.cabecera">
             <tr>
+                <th>Estatus</th>
                 <th>Sistemas</th>
+
             </tr>
         </thead>
         <tbody class="cuerpotabla">
             @foreach($vistas as $nom)
             <tr>
+                <td>
+                    @foreach($estatus as $status)
+                    @if($status->idSistemaPersona == $nom->idSistemaPersona)
+                    <!-- Aquí corregido -->
+                    @if($status->estatus == 1)
+                    Activo
+                    @elseif($status->estatus == 0)
+                    Inactivo
+                    @endif
+                    @endif
+                    @endforeach
+                </td>
+
                 <td>{{ $nom->clavesistema }}</td>
+
+
             </tr>
             @endforeach
         </tbody>

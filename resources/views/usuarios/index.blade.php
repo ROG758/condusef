@@ -19,10 +19,10 @@
                         @endforeach
                     </select>
                     <div>
-                    <a href="{{route('personal.create')}}" class="btn btn-primary ml-auto">
-            <i class="fas fa-plus"></i>
-            AGREGAR
-        </a>
+                        <a href="{{route('personal.create')}}" class="btn btn-primary ml-auto">
+                            <i class="fas fa-plus"></i>
+                            AGREGAR
+                        </a>
                     </div>
                     <?php
                          if(isset($_GET['page'])){
@@ -84,10 +84,14 @@
                         <td>{{$personal->numeroEmpleado}}</td>
                         <td>{{$personal->nombre}} {{$personal->apellidoPaterno}} {{$personal->apellidoMaterno}}</td>
                         <td>{{$personal->area}}</td>
-                        <td>{{$personal->idVicepre}}</td>
+                        <td>
+                        {{ $personal->idVicepre}}
+                        </td>
+
+
                         <td>
                             <div class="btn-group" role="group" aria-label="Basic example">
-                                
+
                                 <a href="{{route('personal.edit', $personal->idPersonal)}}" class="btn btn-primary"><i
                                         class="fas fa-pencil-alt"></i></a>
 

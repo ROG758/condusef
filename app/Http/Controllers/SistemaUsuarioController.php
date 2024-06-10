@@ -9,6 +9,9 @@ use App\Models\AccesoModel;
 use App\Models\VicepresidenciaModel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Response;
+use App\Exports\VistasExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Log; 
 
 class SistemaUsuarioController extends Controller
 {
@@ -32,103 +35,134 @@ class SistemaUsuarioController extends Controller
                 $query->where('p.nombre', 'like', "%$search%")
                     ->orWhere('p.apellidoPaterno', 'like', "%$search%")
                     ->orWhere('p.apellidoMaterno', 'like', "%$search%")
-                    ->orWhere('p.numeroEmpleado' , 'like', "%$search%")
+                    ->orWhere('p.numeroEmpleado', 'like', "%$search%")
                     ->orWhere('a.claveSistema', 'like', "%$search%")
                     ->orWhere('a.nombreSistema', 'like', "%$search%");
             });
         }
+    
+        $estatus = UsuarioVistaModel::all(); 
         
-        $vistas = $query->paginate(15)->appends(['search' => $request->search]);
+        // Definir el límite por página
+        $limit = $request->input('limit', 15);
+        $vistas = $query->paginate($limit)->appends(['search' => $request->search]);
+    
+        // Calcular el índice inicial
+        $currentPage = $vistas->currentPage();
+        $perPage = $vistas->perPage();
+        $init = ($currentPage - 1) * $perPage;
+    
         $acce = $this->unique();
-        $usua= $this->uniqueusuario(); 
-        $vicepres=$this->uniquevicepre();
+        $usua = $this->uniqueusuario(); 
+        $vicepres = $this->uniquevicepre();
+        $area = $this->uniqueArea();
        
-        return view('sistemasUsuarios.index', compact('vistas','acce','usua','vicepres'));
+        return view('sistemasUsuarios.index', compact('vistas', 'acce', 'usua', 'vicepres', 'estatus', 'area', 'init'));
     }
     
+    
 
-    public function pdf(Request $request)
+  
+    public function export(Request $request)
     {
-        $acceSeleccionado = $request->input('acce');        
-        $opcionSeleccionada = $request->input('opcionTodo'); // Captura el valor 
-        
-        if ($acceSeleccionado == "#" || $acceSeleccionado == null) {
-            // Ejecuta la consulta y obtén los datos
-            $vistas = UsuarioVistaModel::join('personal as p', 'usuarios_sistemas.idPersonal', '=', 'p.idPersonal')
-                ->join('accesos as a', 'usuarios_sistemas.idaccesos', '=', 'a.idaccesos')
-                ->select(
-                    UsuarioVistaModel::Raw("CONCAT(p.numeroEmpleado, ' - ', p.nombre, '  ', p.apellidoPaterno, '  ', p.apellidoMaterno) as nombre"),
-                    UsuarioVistaModel::Raw("CONCAT(' ',a.claveSistema, ' - ', a.nombreSistema) as claveSistema"),
-                    'usuarios_sistemas.idSistemaPersona'
-                )
-                ->get(); // Ejecuta la consulta y obtiene los resultados
+        $acceSeleccionado = $request->input('acce');
+        $opcionSeleccionada = $request->input('opcionTodo');
+        $exportType = $request->input('exportType');
     
-            // Pasa los datos a la vista y genera el PDF
-            $pdf = PDF::loadView('sistemasUsuarios.pdf', compact('vistas'));
-            return $pdf->stream();
-        } elseif ($opcionSeleccionada == 'option3') {
-            //nenerar pdf por personal
-            // Obtener el personal asociado a un sistema específico
-            $vistas = PersonalModel::join('usuarios_sistemas', 'personal.idPersonal', '=', 'usuarios_sistemas.idPersonal')
-                ->join('accesos', 'usuarios_sistemas.idAccesos', '=', 'accesos.idAccesos')
-                ->selectRaw("CONCAT(personal.numeroEmpleado, ' ', personal.nombre, ' ', personal.apellidoPaterno, ' ', personal.apellidoMaterno) as nombre, CONCAT(accesos.claveSistema, ' ', accesos.nombreSistema) as clavesistema")
-                ->where('usuarios_sistemas.idPersonal', $acceSeleccionado)
-                ->get();
-          
-            // Obtener y concatenar el nombre completo del personal
-            $resultado = PersonalModel::where('idPersonal', $acceSeleccionado)
-                ->selectRaw("CONCAT(nombre, ' ', apellidoPaterno, ' ', apellidoMaterno) as nombreCompleto")
-                ->pluck('nombreCompleto');
-        
-            // Convertir el resultado a string
-            $nombreCompleto = $resultado->isNotEmpty() ? $resultado[0] : '';
-            
-            // Generar el PDF con la vista correspondiente
-            $pdf = PDF::loadView('sistemasUsuarios.pdf0', compact('vistas', 'nombreCompleto'));
-        
-            return $pdf->stream();
-        }elseif($opcionSeleccionada == 'option4'){
-            //negerar pdf de vicepresidencias 
-            $vistas = UsuarioVistaModel::join('personal as p', 'usuarios_sistemas.idPersonal', '=', 'p.idPersonal')
-            ->join('accesos as a', 'usuarios_sistemas.idaccesos', '=', 'a.idaccesos')
-            ->join('vicepresidencia as v', 'v.idVicepre', '=', 'p.idVicepre')
-            ->selectRaw("CONCAT(p.numeroEmpleado, ' - ', p.nombre, '  ', p.apellidoPaterno, '  ', p.apellidoMaterno) as nombre")
-            ->selectRaw("CONCAT(' ', a.claveSistema, ' - ', a.nombreSistema) as claveSistema")
-            ->where('v.idVicepre', $acceSeleccionado)
-            ->get();
-        // Ejecuta la consulta y obtiene los resultados
-
-            //dd($acceSeleccionado);
-            $resultado = VicepresidenciaModel::where('idVicepre', $acceSeleccionado)
-                ->pluck('vicepresidencia');
-                //dd($resultado);
+        if ($exportType == 'pdf') {
+            if ($acceSeleccionado == "#" || $acceSeleccionado == null) {
+                $vistas = UsuarioVistaModel::join('personal as p', 'usuarios_sistemas.idPersonal', '=', 'p.idPersonal')
+                    ->join('accesos as a', 'usuarios_sistemas.idaccesos', '=', 'a.idaccesos')
+                    ->selectRaw("CONCAT(p.numeroEmpleado, ' - ', p.nombre, ' ', p.apellidoPaterno, ' ', p.apellidoMaterno) as nombre, CONCAT(' ',a.claveSistema, ' - ', a.nombreSistema) as claveSistema, usuarios_sistemas.idSistemaPersona")
+                    ->get();
+    
+                $estatus = UsuarioVistaModel::all();
+    
+                $pdf = PDF::loadView('sistemasUsuarios.pdf', compact('vistas', 'estatus'));
+                return $pdf->stream();
+            } elseif ($opcionSeleccionada == 'option3') {
+                $vistas = PersonalModel::join('usuarios_sistemas', 'personal.idPersonal', '=', 'usuarios_sistemas.idPersonal')
+                    ->join('accesos', 'usuarios_sistemas.idAccesos', '=', 'accesos.idAccesos')
+                    ->selectRaw("CONCAT(personal.numeroEmpleado, ' ', personal.nombre, ' ', personal.apellidoPaterno, ' ', personal.apellidoMaterno) as nombre, CONCAT(accesos.claveSistema, ' ', accesos.nombreSistema) as clavesistema, usuarios_sistemas.idSistemaPersona")
+                    ->where('usuarios_sistemas.idPersonal', $acceSeleccionado)
+                    ->get();
+    
+                $resultado = PersonalModel::where('idPersonal', $acceSeleccionado)
+                    ->selectRaw("CONCAT(nombre, ' ', apellidoPaterno, ' ', apellidoMaterno) as nombreCompleto")
+                    ->pluck('nombreCompleto');
+    
+                $nombreCompleto = $resultado->isNotEmpty() ? $resultado[0] : '';
+                $estatus = UsuarioVistaModel::all();
+    
+                $pdf = PDF::loadView('sistemasUsuarios.pdf0', compact('vistas', 'nombreCompleto', 'estatus'));
+                return $pdf->stream();
+            } elseif ($opcionSeleccionada == 'option4') {
+                $vistas = UsuarioVistaModel::join('personal as p', 'usuarios_sistemas.idPersonal', '=', 'p.idPersonal')
+                    ->join('accesos as a', 'usuarios_sistemas.idaccesos', '=', 'a.idaccesos')
+                    ->join('vicepresidencia as v', 'v.idVicepre', '=', 'p.idVicepre')
+                    ->selectRaw("CONCAT(p.numeroEmpleado, ' - ', p.nombre, ' ', p.apellidoPaterno, ' ', p.apellidoMaterno) as nombre, CONCAT(' ', a.claveSistema, ' - ', a.nombreSistema) as claveSistema, usuarios_sistemas.idSistemaPersona")
+                    ->where('v.idVicepre', $acceSeleccionado)
+                    ->get();
+    
+                $resultado = VicepresidenciaModel::where('idVicepre', $acceSeleccionado)
+                    ->pluck('vicepresidencia');
                 $resultado = strval($resultado[0]);
-
-          
-        // Pasa los datos a la vista y genera el PDF
-        $pdf = PDF::loadView('sistemasUsuarios.pdf2', compact('vistas','resultado'));
-        return $pdf->stream();
-            
-
-        }else {
-
-            //nenerar pdf por sistemas
-            $vistas = PersonalModel::join('usuarios_sistemas', 'personal.idPersonal', '=', 'usuarios_sistemas.idPersonal')
-                ->selectRaw("CONCAT(personal.numeroEmpleado, ' ', personal.nombre, ' ', personal.apellidoPaterno, ' ', personal.apellidoMaterno) as nombre")
-                ->where('usuarios_sistemas.idAccesos', $acceSeleccionado)
+                $estatus = UsuarioVistaModel::all();
+    
+                $pdf = PDF::loadView('sistemasUsuarios.pdf2', compact('vistas', 'resultado', 'estatus'));
+                return $pdf->stream();
+            }else if ($opcionSeleccionada == 'option5') {
+                // Realiza la unión entre las tablas personal y usuarios_sistemas usando join y ejecuta la consulta con get()
+                $vistas = UsuarioVistaModel::join('personal as p', 'usuarios_sistemas.idPersonal', '=', 'p.idPersonal')
+                ->join('accesos as a', 'usuarios_sistemas.idaccesos', '=', 'a.idaccesos')
+                ->join('vicepresidencia as v', 'v.idVicepre', '=', 'p.idVicepre')
+                ->selectRaw("CONCAT(p.numeroEmpleado, ' - ', p.nombre, ' ', p.apellidoPaterno, ' ', p.apellidoMaterno) as nombre, CONCAT(' ', a.claveSistema, ' - ', a.nombreSistema) as claveSistema, usuarios_sistemas.idSistemaPersona")
+                ->where('p.area', $acceSeleccionado)  // Filtra por área
                 ->get();
-    
+            
+                // Obtén el valor del área seleccionada usando pluck y conviértelo a cadena
+                $resultado = personalModel::where('area', $acceSeleccionado)->pluck('area')->first();
                
-            $resultado = AccesoModel::where('idAccesos', $acceSeleccionado)->pluck('nombreSistema');
-            $resultado = strval($resultado[0]);
+                $estatus = UsuarioVistaModel::all();
+                
+
+                $area = personalModel::all();
+            
+                // Carga la vista del PDF con los datos obtenidos
+                $pdf = PDF::loadView('sistemasUsuarios.pdf3', compact('area', 'resultado', 'vistas','estatus'));
+            
+                return $pdf->stream();
+
+            }else {
+                $vistas = PersonalModel::join('usuarios_sistemas', 'personal.idPersonal', '=', 'usuarios_sistemas.idPersonal')
+                    ->selectRaw("CONCAT(personal.numeroEmpleado, ' ', personal.nombre, ' ', personal.apellidoPaterno, ' ', personal.apellidoMaterno) as nombre, usuarios_sistemas.idSistemaPersona")
+                    ->where('usuarios_sistemas.idAccesos', $acceSeleccionado)
+                    ->get();
     
-            $pdf = PDF::loadView('sistemasUsuarios.pdf1', compact('vistas', 'resultado'));
+                $resultado = AccesoModel::where('idAccesos', $acceSeleccionado)->pluck('nombreSistema');
+                $resultado = strval($resultado[0]);
+                $estatus = UsuarioVistaModel::all();
     
-            return $pdf->stream();
+                $pdf = PDF::loadView('sistemasUsuarios.pdf1', compact('vistas', 'resultado', 'estatus'));
+                return $pdf->stream();
+            }
+        } elseif ($exportType == 'excel') {
+            return Excel::download(new VistasExport($acceSeleccionado, $opcionSeleccionada), 'report.xlsx');
         }
     }
     
+    public function UpdateStatus(Request $request)
+    {
+        $usuario = UsuarioVistaModel::findOrFail($request->idSistemaPersona);
+        $usuario->estatus = $request->estatus;
+        $usuario->save();
     
+        $newStatusButton = $request->estatus == 0
+            ? '<br><input id="toggle'.$request->idSistemaPersona.'" class="mi_checkbox" type="checkbox" data-id="'.$request->idSistemaPersona.'" data-onstyle="success" data-offstyle="danger" data-toggle="toggle" data-on="Activo" data-off="Inactivo">'
+            : '<br><input id="toggle'.$request->idSistemaPersona.'" class="mi_checkbox" type="checkbox" data-id="'.$request->idSistemaPersona.'" data-onstyle="success" data-offstyle="danger" data-toggle="toggle" data-on="Activo" data-off="Inactivo" checked>';
+    
+        return response()->json(['newStatus' => $newStatusButton]);
+    }
     
 
     /**
@@ -205,6 +239,8 @@ class SistemaUsuarioController extends Controller
             ->route('sistemas.index');
         }
     }
+
+
     // sistemas de informacion
     public function unique()
     {   
@@ -248,6 +284,16 @@ class SistemaUsuarioController extends Controller
         return $vicepresidencias;
        }
 
+       public function uniqueArea(){
+        $area = personalModel::join('usuarios_sistemas', 'personal.idPersonal', '=', 'usuarios_sistemas.idPersonal')
+        ->select('personal.area', 'personal.idPersonal')
+        ->distinct('personal.area')
+        ->get();
+
+        return $area;
+
+       }
+
 
     public function obtenerDatosAccesoJson()
     {
@@ -287,6 +333,15 @@ class SistemaUsuarioController extends Controller
             ->distinct('vicepresidencia.idVicepre')
             ->get();
         return Response::json($concatvicepresidencia);
+    }
+
+    public function obtenerAreaJson() {
+        $area = personalModel::join('usuarios_sistemas', 'personal.idPersonal', '=', 'usuarios_sistemas.idPersonal')
+            ->select('personal.area')
+            ->distinct()
+            ->get();
+
+        return response()->json($area);
     }
         
     }

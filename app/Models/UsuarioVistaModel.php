@@ -19,6 +19,7 @@ class UsuarioVistaModel extends Model
        
         'idPersonal',
         'idAccesos',
+        'estatus',
         
 
     ]; 

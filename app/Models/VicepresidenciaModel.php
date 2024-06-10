@@ -15,4 +15,9 @@ class VicepresidenciaModel extends Model
     protected $fillable =[
             'vicepresidensia'
     ];
+
+    public function vicepresidencia()
+{
+    return $this->belongsTo(VicepresidenciaModel::class, 'idVicepre');
+}
 }

@@ -39,3 +39,14 @@
 
     </div>
 </div>
+
+
+
+
+<script>
+$(document).ready(function() {
+    $('#idPersonal').select2({
+        width: 'resolve' // Usa el ancho del contenedor padre
+    });
+});
+</script>

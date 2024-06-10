@@ -36,6 +36,9 @@ route::group(['middleware' => ['auth']], function () {
     Route::GET('/obtener-datos-acce', [SistemaUsuarioController::class,'obtenerDatosAccesoJson'])->name('obtener-datos-acce');
     Route::GET('/obtener-datos-usuario', [SistemaUsuarioController::class,'obtenerDatosUsuarioJson'])->name('obtener-datos-usuario');
     Route::GET('/obtener-datos-vicepresidencia',[SistemaUsuarioController::class,'obtenerDatosVicepresidenciaJson'])->name('obtener-datos-vicepresidencia');
+    Route::get('/obtener-datos-area', [SistemaUsuarioController::class, 'obtenerAreaJson'])->name('obtener-datos-area');
+    Route::post('/actualizar-status', [SistemaUsuarioController::class, 'UpdateStatus'])->name('actualizar-status');
+    Route::post('/export', [SistemaUsuarioController::class, 'export'])->name('export');
     Route::resource('acceso', AccesoController::class);
     Route::resource('personal', personalController::class);
     Route::resource('sistemas', SistemaUsuarioController::class);

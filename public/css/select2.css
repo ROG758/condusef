@@ -1,0 +1,24 @@
+
+/* Ajusta el ancho de Select2 al 100% del contenedor */
+.select2-container {
+    width: 100% !important;
+}
+
+/* Ajusta el ancho de Select2 cuando esté activo */
+.select2-container--default .select2-selection--single {
+    height: calc(2.25rem + 2px); /* Coincide con la altura de .form-control de Bootstrap */
+    padding: 0.375rem 0.75rem; /* Coincide con el padding de .form-control de Bootstrap */
+    box-sizing: border-box; /* Asegura que el tamaño del contenedor incluye el padding y el borde */
+}
+
+/* Asegúrate de que el dropdown no cambie de tamaño */
+.select2-container .select2-dropdown {
+    width: auto !important;
+    min-width: 100% !important;
+}
+
+/* Ajusta el tamaño de los elementos dentro del dropdown */
+.select2-container .select2-selection__rendered {
+    line-height: calc(2.25rem + 2px); /* Coincide con la altura de .form-control de Bootstrap */
+}
+

@@ -20,6 +20,8 @@ return new class extends Migration
             $table->integer('idAccesos')->unsigned()->requiered();
             $table->foreign('idAccesos')->references('idAccesos')->on('accesos');
 
+            $table->string('estatus')->default("1");
+
         
             $table->timestamps();
         });
