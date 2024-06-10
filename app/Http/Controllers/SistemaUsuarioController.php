@@ -65,6 +65,9 @@ class SistemaUsuarioController extends Controller
   
     public function export(Request $request)
     {
+
+        ini_set('memory_limit', '1024M');
+
         $acceSeleccionado = $request->input('acce');
         $opcionSeleccionada = $request->input('opcionTodo');
         $exportType = $request->input('exportType');
@@ -83,7 +86,7 @@ class SistemaUsuarioController extends Controller
             } elseif ($opcionSeleccionada == 'option3') {
                 $vistas = PersonalModel::join('usuarios_sistemas', 'personal.idPersonal', '=', 'usuarios_sistemas.idPersonal')
                     ->join('accesos', 'usuarios_sistemas.idAccesos', '=', 'accesos.idAccesos')
-                    ->selectRaw("CONCAT(personal.numeroEmpleado, ' ', personal.nombre, ' ', personal.apellidoPaterno, ' ', personal.apellidoMaterno) as nombre, CONCAT(accesos.claveSistema, ' ', accesos.nombreSistema) as clavesistema, usuarios_sistemas.idSistemaPersona")
+                    ->selectRaw("CONCAT(personal.numeroEmpleado, ' ','-', personal.nombre, ' ', personal.apellidoPaterno, ' ', personal.apellidoMaterno) as nombre, CONCAT(accesos.claveSistema, ' ', accesos.nombreSistema) as clavesistema, usuarios_sistemas.idSistemaPersona")
                     ->where('usuarios_sistemas.idPersonal', $acceSeleccionado)
                     ->get();
     
@@ -135,7 +138,7 @@ class SistemaUsuarioController extends Controller
 
             }else {
                 $vistas = PersonalModel::join('usuarios_sistemas', 'personal.idPersonal', '=', 'usuarios_sistemas.idPersonal')
-                    ->selectRaw("CONCAT(personal.numeroEmpleado, ' ', personal.nombre, ' ', personal.apellidoPaterno, ' ', personal.apellidoMaterno) as nombre, usuarios_sistemas.idSistemaPersona")
+                    ->selectRaw("CONCAT(personal.numeroEmpleado, ' ','- ', personal.nombre, ' ', personal.apellidoPaterno, ' ', personal.apellidoMaterno) as nombre, usuarios_sistemas.idSistemaPersona")
                     ->where('usuarios_sistemas.idAccesos', $acceSeleccionado)
                     ->get();
     
